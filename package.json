@@ -1,6 +1,6 @@
 {
   "name": "capacitor-webview-controller",
-  "version": "0.0.1",
+  "version": "0.0.6",
   "description": "control capacitorjs webviews cross platform.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -11,7 +11,8 @@
     "android/build.gradle",
     "dist/",
     "ios/Plugin/",
-    "CapacitorWebviewController.podspec"
+    "CapacitorWebviewController.podspec",
+    "electron/dist"
   ],
   "author": "LQR471814",
   "license": "MIT",
@@ -25,13 +26,14 @@
   "keywords": [
     "capacitor",
     "plugin",
-    "native"
+    "native",
+    "electron"
   ],
   "scripts": {
-    "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
+    "verify": "npm run verify:ios && npm run verify:android && npm run verify:electron",
     "verify:ios": "cd ios && pod install && xcodebuild -workspace Plugin.xcworkspace -scheme Plugin -destination generic/platform=iOS && cd ..",
     "verify:android": "cd android && ./gradlew clean build test && cd ..",
-    "verify:web": "npm run build",
+    "verify:electron": "npm run build",
     "lint": "npm run eslint && npm run prettier -- --check && npm run swiftlint -- lint",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write && npm run swiftlint -- --fix --format",
     "eslint": "eslint . --ext ts",
@@ -39,6 +41,7 @@
     "swiftlint": "node-swiftlint",
     "docgen": "docgen --api WebviewControllerPlugin --output-readme README.md --output-json dist/docs.json",
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.js",
+    "build-electron": "tsc --project electron/tsconfig.json && rollup -c electron/rollup.config.js && rimraf ./electron/build",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build"
@@ -51,6 +54,7 @@
     "@ionic/eslint-config": "^0.3.0",
     "@ionic/prettier-config": "^1.0.1",
     "@ionic/swiftlint-config": "^1.1.2",
+    "@rollup/plugin-commonjs": "^25.0.4",
     "eslint": "^7.11.0",
     "prettier": "~2.3.0",
     "prettier-plugin-java": "~1.0.2",
@@ -73,6 +77,15 @@
     },
     "android": {
       "src": "android"
+    },
+    "electron": {
+      "src": "electron"
     }
+  },
+  "dependencies": {
+    "electron": "^26.2.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

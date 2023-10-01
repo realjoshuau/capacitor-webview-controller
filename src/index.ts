@@ -1,13 +1,13 @@
-import { registerPlugin } from '@capacitor/core';
+import { registerPlugin } from "@capacitor/core";
 
-import type { WebviewControllerPlugin } from './definitions';
+import type { WebviewControllerPlugin } from "./definitions";
 
 const WebviewController = registerPlugin<WebviewControllerPlugin>(
-  'WebviewController',
+  "WebviewController",
   {
-    web: () => import('./web').then(m => new m.WebviewControllerWeb()),
-  },
+    electron: () => (window as any).CapacitorCustomPlatform.plugins.WebviewController,
+  }
 );
 
-export * from './definitions';
+export * from "./definitions";
 export { WebviewController };
