@@ -23,9 +23,9 @@ export class WebviewController extends EventEmitter implements WebviewController
     const mainSession = this.window.webContents.session;
 
     const customCSP = "script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src 'self' 'unsafe-inline' *;";
-    if (typeof userAgent !== "undefined"){
-      session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-        details.requestHeaders['User-Agent'] = userAgent;
+    if (typeof options.userAgent !== "undefined") {
+      mainSession.webRequest.onBeforeSendHeaders((details, callback) => {
+        details.requestHeaders['User-Agent'] = options.userAgent ?? "";
         callback({ cancel: false, requestHeaders: details.requestHeaders });
       });
     }
@@ -36,7 +36,7 @@ export class WebviewController extends EventEmitter implements WebviewController
       callback({ cancel: false, responseHeaders });
     });
 
-    this.window.loadURL(options.url, 
+    this.window.loadURL(options.url);
     return Promise.resolve()
   }
   closeWindow(): Promise<void> {
