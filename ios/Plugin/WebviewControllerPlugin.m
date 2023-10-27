@@ -1,8 +1,13 @@
 #import <Foundation/Foundation.h>
 #import <Capacitor/Capacitor.h>
+#import <WebKit/WebKit.h>
 
-// Define the plugin using the CAP_PLUGIN Macro, and
-// each method the plugin supports using the CAP_PLUGIN_METHOD macro.
-CAP_PLUGIN(WebviewControllerPlugin, "WebviewController",
-           CAP_PLUGIN_METHOD(echo, CAPPluginReturnPromise);
-)
+CAP_PLUGIN(WebViewControllerPlugin, "WebViewController",
+   CAP_PLUGIN_METHOD(loadURL, CAPPluginReturnPromise);
+   CAP_PLUGIN_METHOD(closeWindow, CAPPluginReturnPromise);
+   CAP_PLUGIN_METHOD(evaluateJavaScript, CAPPluginReturnPromise);
+   CAP_PLUGIN_METHOD(show, CAPPluginReturnNone);
+   CAP_PLUGIN_METHOD(hide, CAPPluginReturnNone);
+   CAP_PLUGIN_METHOD(addListener, CAPPluginReturnCallback);
+   CAP_PLUGIN_METHOD(removeListener, CAPPluginReturnNone);
+);

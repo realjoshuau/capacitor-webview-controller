@@ -13,16 +13,16 @@ npx cap sync
 
 <docgen-index>
 
-* [`loadURL(...)`](#loadurl)
-* [`closeWindow()`](#closewindow)
-* [`evaluateJavaScript(...)`](#evaluatejavascript)
-* [`show()`](#show)
-* [`hide()`](#hide)
-* [`addListener('navigation', ...)`](#addlistenernavigation)
-* [`addListener('page loaded', ...)`](#addlistenerpage-loaded)
-* [`addListener('closed', ...)`](#addlistenerclosed)
-* [Interfaces](#interfaces)
-* [Type Aliases](#type-aliases)
+- [`loadURL(...)`](#loadurl)
+- [`closeWindow()`](#closewindow)
+- [`evaluateJavaScript(...)`](#evaluatejavascript)
+- [`show()`](#show)
+- [`hide()`](#hide)
+- [`addListener('navigation', ...)`](#addlistenernavigation)
+- [`addListener('page loaded', ...)`](#addlistenerpage-loaded)
+- [`addListener('closed', ...)`](#addlistenerclosed)
+- [Interfaces](#interfaces)
+- [Type Aliases](#type-aliases)
 
 </docgen-index>
 
@@ -32,15 +32,14 @@ npx cap sync
 ### loadURL(...)
 
 ```typescript
-loadURL(options: { url: string; }) => Promise<void>
+loadURL(options: { url: string, userAgent?: string }) => Promise<void>
 ```
 
 | Param         | Type                          |
 | ------------- | ----------------------------- |
 | **`options`** | <code>{ url: string; }</code> |
 
---------------------
-
+---
 
 ### closeWindow()
 
@@ -48,8 +47,7 @@ loadURL(options: { url: string; }) => Promise<void>
 closeWindow() => Promise<void>
 ```
 
---------------------
-
+---
 
 ### evaluateJavaScript(...)
 
@@ -63,8 +61,7 @@ evaluateJavaScript(options: { javascript: string; }) => Promise<{ result: string
 
 **Returns:** <code>Promise&lt;{ result: string; }&gt;</code>
 
---------------------
-
+---
 
 ### show()
 
@@ -72,8 +69,7 @@ evaluateJavaScript(options: { javascript: string; }) => Promise<{ result: string
 show() => Promise<void>
 ```
 
---------------------
-
+---
 
 ### hide()
 
@@ -81,8 +77,7 @@ show() => Promise<void>
 hide() => Promise<void>
 ```
 
---------------------
-
+---
 
 ### addListener('navigation', ...)
 
@@ -97,8 +92,7 @@ addListener(event: "navigation", listener: (args: PageEvent) => void) => Promise
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt; & <a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
---------------------
-
+---
 
 ### addListener('page loaded', ...)
 
@@ -113,8 +107,7 @@ addListener(event: "page loaded", listener: (args: PageEvent) => void) => Promis
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt; & <a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
---------------------
-
+---
 
 ### addListener('closed', ...)
 
@@ -129,11 +122,9 @@ addListener(event: "closed", listener: () => void) => Promise<PluginListenerHand
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt; & <a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
---------------------
-
+---
 
 ### Interfaces
-
 
 #### PluginListenerHandle
 
@@ -141,9 +132,7 @@ addListener(event: "closed", listener: () => void) => Promise<PluginListenerHand
 | ------------ | ----------------------------------------- |
 | **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
 
-
 ### Type Aliases
-
 
 #### PageEvent
 

@@ -5,7 +5,7 @@ export type PageEvent = {
 }
 
 export interface WebviewControllerPlugin {
-  loadURL(options: { url: string }): Promise<void>
+  loadURL(options: { url: string, userAgent?: string }): Promise<void>
   closeWindow(): Promise<void>
   evaluateJavaScript(options: { javascript: string }): Promise<{ result: string; }>;
 

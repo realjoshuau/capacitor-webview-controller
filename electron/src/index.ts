@@ -1,7 +1,9 @@
 import type { PluginListenerHandle } from "@capacitor/core";
 import { BrowserWindow } from "electron";
-import type { PageEvent, WebviewControllerPlugin } from "../../src/definitions"
 import { EventEmitter } from "node:events"
+
+import type { PageEvent, WebviewControllerPlugin } from "../../src/definitions"
+
 
 export class WebviewController extends EventEmitter implements WebviewControllerPlugin {
   window?: BrowserWindow
