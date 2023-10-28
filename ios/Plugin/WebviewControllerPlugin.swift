@@ -15,8 +15,11 @@ public class WebViewControllerPlugin: CAPPlugin, WKNavigationDelegate {
     }
 
     @objc func loadURL(_ call: CAPPluginCall) {
-        let urlString = call.getString("url") ?? ""
-        let userAgent = call.getString("userAgent") // Optional value
+        
+        print("Loading webview....");
+        
+        let urlString = call.getString("url") ?? "https://google.com"
+        let userAgent = call.getString("userAgent") ?? ""
 
         let webViewConfiguration = WKWebViewConfiguration()
         webViewConfiguration.applicationNameForUserAgent = userAgent
@@ -30,19 +33,20 @@ public class WebViewControllerPlugin: CAPPlugin, WKNavigationDelegate {
                 NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationName.willNavigate.rawValue), object: url)
             }
 
-            if let window = UIApplication.shared.windows.first {
-                window.addSubview(self.webView!)
-                window.bringSubviewToFront(self.webView!)
+            if let customWebView = self.customWebView, let viewController = self.bridge?.viewController {
+                viewController.view.addSubview(customWebView)
             }
 
             call.resolve()
         }
+        
+        call.resolve();
     }
 
     @objc func closeWindow(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             self.customWebView?.removeFromSuperview()
-            self.webView = nil
+            self.customWebView = nil
             NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationName.didClose.rawValue), object: nil)
         }
 
