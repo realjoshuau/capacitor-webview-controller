@@ -9,12 +9,12 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebSettings;
+import android.view.ViewGroup;
 import android.view.View;
-import android.content.Context;
 
 @CapacitorPlugin(name = "WebviewController")
 public class WebviewControllerPlugin extends Plugin {
-    private Webview webview;
+    private WebView webview;
 
     @Override
     public void load() {
@@ -25,7 +25,7 @@ public class WebviewControllerPlugin extends Plugin {
         if (webview != null) {
             return;
         }
-        webview = new WebView(context);
+        webview = new WebView(this.getContext());
 
         ((ViewGroup) getBridge().getWebView().getParent()).addView(webview);
 
@@ -42,97 +42,82 @@ public class WebviewControllerPlugin extends Plugin {
         ViewGroup rootGroup = ((ViewGroup) getBridge().getWebView().getParent());
         int count = rootGroup.getChildCount();
         if (count > 1) {
-            rootGroup.removeView(webView);
-            webView.destroyDrawingCache();
-            webView.destroy();
-            webView = null;
+            rootGroup.removeView(webview);
+            webview.destroyDrawingCache();
+            webview.destroy();
+            webview = null;
         }
     }
 
     @PluginMethod
     public void loadURL(PluginCall call) {
         String url = call.getString("url");
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                ensureWebView();
-                webview.loadUrl(url);
-                call.success();
-            }
+        if (url == null) {
+            call.reject(("Must provide a url to load."));
+            return;
+        }
+        getActivity().runOnUiThread(() -> {
+            ensureWebView();
+            webview.loadUrl(url);
+            call.resolve();
         });
     }
 
     @PluginMethod
     public void closeWindow(PluginCall call) {
         if (webview == null) {
-            call.error("Must initialize webview first.");
+            call.reject("Must initialize webview first.");
             return;
         }
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                closeWebView();
-                call.success();
-            }
+        getActivity().runOnUiThread(() -> {
+            closeWebView();
+            call.resolve();
         });
     }
 
     @PluginMethod
     public void evaluateJavascript(PluginCall call) {
-        if (javascript.isEmpty()) {
-            call.error("Must provide javascript string.");
+        String javascript = call.getString("javascript");
+        if (javascript == null || javascript.isEmpty()) {
+            call.reject("Must provide javascript string.");
             return;
         }
         if (webview == null) {
-            call.error("Must initialize webview first.");
+            call.reject("Must initialize webview first.");
             return;
         }
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                webview.evaluateJavascript(
-                    call.getString("javascript"),
-                    new ValueCallback<String>() {
-                        @Override
-                        public void onReceiveValue(String result) {
-                            JSObject obj = new JSObject();
-                            obj.put("result", result);
-                            call.resolve(obj);
-                        }
-                    }
-                );
+        getActivity().runOnUiThread(() -> webview.evaluateJavascript(
+            javascript,
+            result -> {
+                JSObject obj = new JSObject();
+                obj.put("result", result);
+                call.resolve(obj);
             }
-        })
-        call.success();
+        ));
+        call.resolve();
     }
 
     @PluginMethod
     public void show(PluginCall call) {
         if (webview == null) {
-            call.error("Must initialize webview first.");
+            call.reject("Must initialize webview first.");
             return;
         }
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                webView.setVisibility(View.VISIBLE);
-                call.success();
-            }
+        getActivity().runOnUiThread(() -> {
+            webview.setVisibility(View.VISIBLE);
+            call.resolve();
         });
     }
 
     @PluginMethod
-    public void hide() {
+    public void hide(PluginCall call) {
         if (webview == null) {
-            call.error("Must initialize webview first.");
+            call.reject("Must initialize webview first.");
             return;
         }
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                webView.setVisibility(View.INVISIBLE);
-                call.success();
-            }
+        getActivity().runOnUiThread(() -> {
+            webview.setVisibility(View.INVISIBLE);
+            call.resolve();
         });
     }
 }
