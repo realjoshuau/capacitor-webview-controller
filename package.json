@@ -1,6 +1,6 @@
 {
   "name": "capacitor-webview-controller",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "control capacitorjs webviews cross platform.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
