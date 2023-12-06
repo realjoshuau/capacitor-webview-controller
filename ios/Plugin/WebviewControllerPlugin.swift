@@ -249,7 +249,7 @@ public class WebviewControllerPlugin: CAPPlugin {
             webConfiguration.mediaTypesRequiringUserActionForPlayback = []
                 webConfiguration.applicationNameForUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Mobile/15E148 Safari/604.1" // Use this to bypass google's "Secure Browsers Policy" thing
             if let websiteDataStore = self.bridge?.webView?.configuration.websiteDataStore {
-                webConfiguration.websiteDataStore = websiteDataStore // How the hell does this work?
+                webConfiguration.websiteDataStore = websiteDataStore // How does this work?
             } else {
                 print("WAS NOT ABLE TO GET WEBSITE DATA STORE. DO NOT CONTINUE!")
                 webConfiguration.websiteDataStore = WKWebsiteDataStore.default()
