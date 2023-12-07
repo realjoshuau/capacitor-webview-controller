@@ -1,5 +1,26 @@
 import Foundation
 import Capacitor
+import UIKit
+
+
+func generateUserAgent() -> String {
+    // Retrieve the current iOS Version
+    let iosVersion = UIDevice.current.systemVersion
+    
+    // Define a basic user-agent format for Safari on iPhone
+    let baseUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS %@ like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/%@ Mobile/15E148 Safari/604.1"
+    
+    // Extract the major version of iOS as that is used in the Safari part of the UA
+    // For a more precise version match, you may want to use the full iosVersion string
+    let majorVersion = iosVersion.split(separator: ".").first ?? "13"  // Default to `13` if not able to get major version.
+    
+    // Format the user-agent string, replacing placeholders with the actual versions
+    let formattedUserAgent = String(format: baseUserAgent, iosVersion, majorVersion as CVarArg)
+    
+    print("requested UA gen: " + formattedUserAgent)
+
+    return formattedUserAgent
+}
 
 class WebviewOverlay: UIViewController, WKUIDelegate, WKNavigationDelegate {
 
@@ -34,14 +55,17 @@ class WebviewOverlay: UIViewController, WKUIDelegate, WKNavigationDelegate {
 
     override func loadView() {
         self.webview = WKWebView(frame: .zero, configuration: self.configuration)
+        self.webview?.customUserAgent = generateUserAgent()
         self.webview?.uiDelegate = self
         self.webview?.navigationDelegate = self
+        self.webview?.allowsLinkPreview = true
+        
 
         view = self.webview
         view.isHidden = plugin.hidden
         view.backgroundColor = .white;
         self.webview?.scrollView.bounces = false
-        self.webview?.allowsBackForwardNavigationGestures = false;
+        self.webview?.allowsBackForwardNavigationGestures = true;
 
         self.webview?.isOpaque = false
 
@@ -130,12 +154,7 @@ class WebviewOverlay: UIViewController, WKUIDelegate, WKNavigationDelegate {
         if let scheme = url?.scheme, scheme == "com.powerschool.portal" {
             // Handle the URL with your custom logic
             handleCustomScheme(url: url)
-            decisionHandler(.cancel) // Cancel the navigation for this scheme
-
-            // TODO: Copy the localStorage of this (the overlay) into the localStorage of the WKWebView that hosts the app
-            // Can get the WKWebView that hosts the app like so:
-            // self.plugin.bridge?.webView (WKWebview)
-            
+            decisionHandler(.cancel) // Cancel the navigation for this scheme. This should hopefully prevent PS Mobile from opening.
             return
         }
         
@@ -241,36 +260,33 @@ public class WebviewControllerPlugin: CAPPlugin {
 
     @objc func loadURL(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
-            let prefs = WKPreferences()
-            prefs.javaScriptEnabled = false
             let webConfiguration = WKWebViewConfiguration()
-            webConfiguration.preferences = prefs;
             webConfiguration.allowsInlineMediaPlayback = true
             webConfiguration.mediaTypesRequiringUserActionForPlayback = []
-                webConfiguration.applicationNameForUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Mobile/15E148 Safari/604.1" // Use this to bypass google's "Secure Browsers Policy" thing
+//                webConfiguration.applicationNameForUserAgent = "VC Browser (iOS)/v2-redesign Mobile/15E148 Version/15.0" // Use this to bypass google's "Secure Browsers Policy" thing
             if let websiteDataStore = self.bridge?.webView?.configuration.websiteDataStore {
-                webConfiguration.websiteDataStore = websiteDataStore // How does this work?
+                webConfiguration.websiteDataStore = websiteDataStore // How.
             } else {
                 print("WAS NOT ABLE TO GET WEBSITE DATA STORE. DO NOT CONTINUE!")
                 webConfiguration.websiteDataStore = WKWebsiteDataStore.default()
             }
             // Content controller
-            let javascript = call.getString("javascript") ?? ""
-            if !javascript.isEmpty {
-                var injectionTime: WKUserScriptInjectionTime!
-                switch call.getInt("injectionTime") {
-                case 0:
-                    injectionTime = .atDocumentStart
-                case 1:
-                    injectionTime = .atDocumentEnd
-                default:
-                    injectionTime = .atDocumentStart
-                }
-                let contentController = WKUserContentController()
-                let script = WKUserScript(source: javascript, injectionTime: injectionTime, forMainFrameOnly: true)
-                contentController.addUserScript(script)
-                webConfiguration.userContentController = contentController
-            }
+//            let javascript = call.getString("javascript") ?? ""
+//            if !javascript.isEmpty {
+//                var injectionTime: WKUserScriptInjectionTime!
+//                switch call.getInt("injectionTime") {
+//                case 0:
+//                    injectionTime = .atDocumentStart
+//                case 1:
+//                    injectionTime = .atDocumentEnd
+//                default:
+//                    injectionTime = .atDocumentStart
+//                }
+//                let contentController = WKUserContentController()
+//                let script = WKUserScript(source: javascript, injectionTime: injectionTime, forMainFrameOnly: true)
+//                contentController.addUserScript(script)
+//                webConfiguration.userContentController = contentController
+//            }
 
             self.webviewOverlay = WebviewOverlay(self, configuration: webConfiguration)
 
@@ -282,7 +298,7 @@ public class WebviewControllerPlugin: CAPPlugin {
             if let url = URL(string: urlString),
                let encodedURLString = url.absoluteString.data(using: .utf8)?.base64EncodedString() {
                 let updatedURLString = "https://vc-assist.github.io/auth.html?url=\(encodedURLString)"
-                if let updatedURL = URL(string: updatedURLString) {
+                if let updatedURL = URL(string: urlString) {
                     self.hidden = false
 
                     self.width = CGFloat(call.getFloat("width") ?? 0)
